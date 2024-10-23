@@ -7,9 +7,10 @@ import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-
 interface Patient {
   mrn: string;
   patient_name: string;
+  age: number;
+  gender: string;
   admission_date: string;
   specialty: string;
-  patient_status: string;
   diagnosis: string;
   updated_at: string;
 }
@@ -17,9 +18,10 @@ interface Patient {
 interface Consultation {
   mrn: string;
   patient_name: string;
+  age: number;
+  gender: string;
   created_at: string;
   consultation_specialty: string;
-  status: string;
   requesting_department: string;
   updated_at: string;
 }
@@ -42,6 +44,7 @@ interface Appointment {
   patient_medical_number: string;
   clinic_specialty: string;
   appointment_type: 'Urgent' | 'Regular';
+  notes: string;
   created_at: string;
 }
 
@@ -155,8 +158,8 @@ const MyDocument: React.FC<{
         <View style={[styles.tableRow, styles.tableHeader]}>
           <View style={styles.tableCol}><Text style={styles.tableCell}>MRN</Text></View>
           <View style={styles.tableCol}><Text style={styles.tableCell}>Patient Name</Text></View>
+          <View style={styles.tableCol}><Text style={styles.tableCell}>Age/Gender</Text></View>
           <View style={styles.tableCol}><Text style={styles.tableCell}>Specialty</Text></View>
-          <View style={styles.tableCol}><Text style={styles.tableCell}>Status</Text></View>
           <View style={styles.tableCol}><Text style={styles.tableCell}>Diagnosis/Department</Text></View>
         </View>
         {patients.map((patient) => (
@@ -164,13 +167,11 @@ const MyDocument: React.FC<{
             <View style={styles.tableCol}><Text style={styles.tableCell}>{patient.mrn}</Text></View>
             <View style={styles.tableCol}><Text style={styles.tableCell}>{patient.patient_name}</Text></View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>
-                {(patient as Patient).specialty || (patient as Consultation).consultation_specialty}
-              </Text>
+              <Text style={styles.tableCell}>{patient.age} / {patient.gender}</Text>
             </View>
             <View style={styles.tableCol}>
               <Text style={styles.tableCell}>
-                {patient.patient_status || (patient as Consultation).status}
+                {(patient as Patient).specialty || (patient as Consultation).consultation_specialty}
               </Text>
             </View>
             <View style={styles.tableCol}>
@@ -189,6 +190,7 @@ const MyDocument: React.FC<{
           <View style={styles.tableCol}><Text style={styles.tableCell}>Medical Number</Text></View>
           <View style={styles.tableCol}><Text style={styles.tableCell}>Specialty</Text></View>
           <View style={styles.tableCol}><Text style={styles.tableCell}>Type</Text></View>
+          <View style={styles.tableCol}><Text style={styles.tableCell}>Notes</Text></View>
         </View>
         {appointments.map((appointment) => (
           <View style={styles.tableRow} key={appointment.appointment_id}>
@@ -196,6 +198,7 @@ const MyDocument: React.FC<{
             <View style={styles.tableCol}><Text style={styles.tableCell}>{appointment.patient_medical_number}</Text></View>
             <View style={styles.tableCol}><Text style={styles.tableCell}>{appointment.clinic_specialty}</Text></View>
             <View style={styles.tableCol}><Text style={styles.tableCell}>{appointment.appointment_type}</Text></View>
+            <View style={styles.tableCol}><Text style={styles.tableCell}>{appointment.notes}</Text></View>
           </View>
         ))}
       </View>
@@ -397,8 +400,8 @@ const DailyReportManagement: React.FC = () => {
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MRN</th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient Name</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age/Gender</th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialty</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Diagnosis/Department</th>
                     </tr>
                   </thead>
@@ -408,16 +411,10 @@ const DailyReportManagement: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{patient.mrn}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{patient.patient_name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {(patient as Patient).specialty || (patient as Consultation).consultation_specialty}
+                          {patient.age} / {patient.gender}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            patient.patient_status === 'Active' || (patient as Consultation).status === 'Active'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {patient.patient_status || (patient as Consultation).status}
-                          </span>
+                          {(patient as Patient).specialty || (patient as Consultation).consultation_specialty}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {(patient as Patient).diagnosis || (patient as Consultation).requesting_department}
@@ -447,6 +444,7 @@ const DailyReportManagement: React.FC = () => {
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medical Number</th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialty</th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -462,6 +460,7 @@ const DailyReportManagement: React.FC = () => {
                             {appointment.appointment_type}
                           </span>
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{appointment.notes}</td>
                       </tr>
                     ))}
                   </tbody>
