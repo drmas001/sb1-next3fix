@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Filter, Download, FileText } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { toast } from 'react-toastify';
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Image } from '@react-pdf/renderer';
 
 interface Patient {
   mrn: string;
@@ -11,6 +11,7 @@ interface Patient {
   gender: string;
   admission_date: string;
   specialty: string;
+  patient_status: string;
   diagnosis: string;
   updated_at: string;
 }
@@ -22,6 +23,7 @@ interface Consultation {
   gender: string;
   created_at: string;
   consultation_specialty: string;
+  status: string;
   requesting_department: string;
   updated_at: string;
 }
@@ -67,6 +69,14 @@ const styles = StyleSheet.create({
     padding: 30,
     backgroundColor: '#ffffff'
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 20
+  },
+  logo: {
+    width: 120,
+    height: 120
+  },
   title: { 
     fontSize: 24, 
     marginBottom: 20, 
@@ -78,7 +88,8 @@ const styles = StyleSheet.create({
     fontSize: 18, 
     marginBottom: 15,
     color: '#2d3748',
-    fontWeight: 'medium'
+    fontWeight: 'medium',
+    textAlign: 'center'
   },
   sectionTitle: {
     fontSize: 16,
@@ -127,32 +138,19 @@ const MyDocument: React.FC<{
   appointments: Appointment[];
   selectedDate: string;
   selectedSpecialty: string;
-  dailyReports: DailyReport[];
-}> = ({ patients, appointments, selectedDate, selectedSpecialty, dailyReports }) => (
+}> = ({ patients, appointments, selectedDate, selectedSpecialty }) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      <View style={styles.logoContainer}>
+        <Image 
+          src="/logo.png"
+          style={styles.logo}
+        />
+      </View>
       <Text style={styles.title}>Daily Patient Report</Text>
       <Text style={styles.subtitle}>Date: {selectedDate}</Text>
       {selectedSpecialty && <Text style={styles.subtitle}>Specialty: {selectedSpecialty}</Text>}
       
-      <Text style={styles.sectionTitle}>Daily Reports</Text>
-      <View style={styles.table}>
-        <View style={[styles.tableRow, styles.tableHeader]}>
-          <View style={styles.tableCol}><Text style={styles.tableCell}>Patient Name</Text></View>
-          <View style={styles.tableCol}><Text style={styles.tableCell}>MRN</Text></View>
-          <View style={styles.tableCol}><Text style={styles.tableCell}>Report Content</Text></View>
-          <View style={styles.tableCol}><Text style={styles.tableCell}>Report Date</Text></View>
-        </View>
-        {dailyReports.map((report) => (
-          <View style={styles.tableRow} key={report.report_id}>
-            <View style={styles.tableCol}><Text style={styles.tableCell}>{report.patients.patient_name}</Text></View>
-            <View style={styles.tableCol}><Text style={styles.tableCell}>{report.patient_id}</Text></View>
-            <View style={styles.tableCol}><Text style={styles.tableCell}>{report.report_content}</Text></View>
-            <View style={styles.tableCol}><Text style={styles.tableCell}>{new Date(report.report_date).toLocaleDateString()}</Text></View>
-          </View>
-        ))}
-      </View>
-
       <Text style={styles.sectionTitle}>Patients and Consultations</Text>
       <View style={styles.table}>
         <View style={[styles.tableRow, styles.tableHeader]}>
@@ -373,7 +371,6 @@ const DailyReportManagement: React.FC = () => {
                 appointments={appointments}
                 selectedDate={selectedDate}
                 selectedSpecialty={selectedSpecialty}
-                dailyReports={dailyReports}
               />
             }
             fileName={`daily_report_${selectedDate}${selectedSpecialty ? `_${selectedSpecialty}` : ''}.pdf`}
@@ -410,9 +407,7 @@ const DailyReportManagement: React.FC = () => {
                       <tr key={patient.mrn}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{patient.mrn}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{patient.patient_name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {patient.age} / {patient.gender}
-                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{patient.age} / {patient.gender}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {(patient as Patient).specialty || (patient as Consultation).consultation_specialty}
                         </td>
