@@ -69,27 +69,35 @@ const styles = StyleSheet.create({
     padding: 30,
     backgroundColor: '#ffffff'
   },
-  logoContainer: {
-    alignItems: 'center',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 20
   },
+  logoContainer: {
+    width: 80,
+    height: 80
+  },
   logo: {
-    width: 120,
-    height: 120
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain'
+  },
+  headerRight: {
+    flexDirection: 'column',
+    alignItems: 'flex-end'
   },
   title: { 
-    fontSize: 24, 
-    marginBottom: 20, 
-    textAlign: 'center',
+    fontSize: 24,
     color: '#1a365d',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    marginBottom: 5
   },
   subtitle: { 
-    fontSize: 18, 
-    marginBottom: 15,
+    fontSize: 14,
     color: '#2d3748',
-    fontWeight: 'medium',
-    textAlign: 'center'
+    marginBottom: 3
   },
   sectionTitle: {
     fontSize: 16,
@@ -141,15 +149,18 @@ const MyDocument: React.FC<{
 }> = ({ patients, appointments, selectedDate, selectedSpecialty }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={styles.logoContainer}>
-        <Image 
-          src="/logo.png"
-          style={styles.logo}
-        />
+      <View style={styles.header}>
+        <View style={styles.logoContainer}>
+          <Image src="/logo.png" style={styles.logo} />
+        </View>
+        <View style={styles.headerRight}>
+          <Text style={styles.title}>Daily Patient Report</Text>
+          <Text style={styles.subtitle}>Date: {selectedDate}</Text>
+          {selectedSpecialty && (
+            <Text style={styles.subtitle}>Specialty: {selectedSpecialty}</Text>
+          )}
+        </View>
       </View>
-      <Text style={styles.title}>Daily Patient Report</Text>
-      <Text style={styles.subtitle}>Date: {selectedDate}</Text>
-      {selectedSpecialty && <Text style={styles.subtitle}>Specialty: {selectedSpecialty}</Text>}
       
       <Text style={styles.sectionTitle}>Patients and Consultations</Text>
       <View style={styles.table}>
